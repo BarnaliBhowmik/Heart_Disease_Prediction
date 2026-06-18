@@ -1,204 +1,173 @@
-# ❤️ Heart Disease Prediction using Machine Learning
+# Heart Disease Prediction
 
-A beginner-friendly machine learning project that predicts the likelihood of heart disease based on patient health parameters. The project demonstrates the complete workflow of an ML application, including data preprocessing, model training, model serialization, and deployment using Flask. Users can interact with the trained model through a simple web interface to obtain predictions in real time.
+A machine learning web application that predicts the **10-year risk of coronary heart disease (CHD)** based on clinical and lifestyle inputs, built on the Framingham Heart Study dataset.
 
-**Project Level:** Beginner
-
----
-
-## 🚀 Features
-
-- Data preprocessing using Pandas and NumPy
-- Heart disease prediction using Random Forest Classifier
-- Model and scaler serialization using Pickle
-- User-friendly web interface built with Flask
-- Real-time prediction based on user inputs
+🎥 **[Watch Demo](https://drive.google.com/file/d/1YQ-G7gmMIsGlcP55gAYt8kTwqInjTgLX/view?usp=sharing)**
 
 ---
 
-## 🛠️ Tech Stack
+## Overview
 
-- **Python**
-- **Scikit-learn**
-- **Pandas**
-- **NumPy**
-- **Flask**
-- **Pickle**
-- **Jupyter Notebook**
+This project uses a **Random Forest Classifier** trained on the Framingham Heart Study dataset to assess a patient's 10-year CHD risk. Users fill in a 3-step interactive form, and the model returns an instant prediction.
 
 ---
 
-## 📁 Project Structure
+## Features
 
-```text
-Heart_Disease_Prediction/
+- 3-step guided form — Personal, Lifestyle, and Cardiovascular inputs
+- Real-time interactive sliders for numerical values
+- Toggle buttons for categorical fields (Yes / No, Male / Female)
+- Background image with 50% opacity for clean visual presentation
+- Color-coded result — green for low risk, red for high risk
+- Fully integrated Flask backend with pre-trained model and scaler
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | HTML, CSS, JavaScript |
+| Backend | Python, Flask |
+| ML Model | Random Forest Classifier (scikit-learn) |
+| Preprocessing | StandardScaler (scikit-learn) |
+| Model Storage | Pickle (`.pkl`) |
+
+---
+
+## Project Structure
+
+```
+heart-disease-prediction/
 │
 ├── Models/
-│   ├── rf_classifier.pkl
-│   └── scaler.pkl
+│   ├── rf_classifier.pkl       # Trained Random Forest model
+│   └── scaler.pkl              # Fitted StandardScaler
 │
 ├── templates/
-│   └── index.html
+│   └── index.html              # Frontend UI
 │
-├── app.py
-├── Modeling.ipynb
-├── datasets_4123_6408_framingham.csv
-├── .gitignore
+├── static/
+│   └── Heart_Disease.jpeg      # Background image
+│
+├── app.py                      # Flask application
+├── requirements.txt
 └── README.md
 ```
 
 ---
 
-## 📌 Running the Project by Cloning the Repository
+## Input Features
+
+The model uses the following 14 clinical features:
+
+| Feature | Type | Description |
+|---|---|---|
+| Gender | Categorical | Male / Female |
+| Age | Numeric | Age in years |
+| Current Smoker | Categorical | Yes / No |
+| Cigarettes Per Day | Numeric | Average daily cigarette count |
+| BP Medications | Categorical | On BP medication or not |
+| Prevalent Stroke | Categorical | History of stroke |
+| Prevalent Hypertension | Categorical | Diagnosed hypertension |
+| Diabetes | Categorical | Diagnosed diabetes |
+| Total Cholesterol | Numeric | mg/dL |
+| Systolic BP | Numeric | mmHg |
+| Diastolic BP | Numeric | mmHg |
+| BMI | Numeric | kg/m² |
+| Heart Rate | Numeric | Beats per minute |
+| Glucose Level | Numeric | mg/dL |
+
+---
+
+## Getting Started
 
 ### 1. Clone the repository
 
 ```bash
-git clone <repository-url>
-cd Heart_Disease_Prediction
+git clone https://github.com/your-username/heart-disease-prediction.git
+cd heart-disease-prediction
 ```
 
-### 2. Create a virtual environment
-
-```bash
-python -m venv venv
-```
-
-### 3. Activate the virtual environment
-
-#### Windows (PowerShell)
-
-```powershell
-.\venv\Scripts\Activate.ps1
-```
-
-#### Linux/macOS
-
-```bash
-source venv/bin/activate
-```
-
-### 4. Install the required packages
+### 2. Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 5. Run the Flask application
+### 3. Run the app
 
 ```bash
 python app.py
 ```
 
-### 6. Open the application
+### 4. Open in browser
 
-Visit:
-
-```text
+```
 http://127.0.0.1:5000
 ```
 
 ---
 
-## 🔨 Running the Project from Scratch
+## Requirements
 
-### Step 1: Clone the repository
-
-```bash
-git clone <repository-url>
-cd Heart_Disease_Prediction
 ```
-
-### Step 2: Create and activate a virtual environment
-
-```bash
-python -m venv venv
-```
-
-Activate it:
-
-**Windows**
-
-```powershell
-.\venv\Scripts\Activate.ps1
-```
-
-**Linux/macOS**
-
-```bash
-source venv/bin/activate
-```
-
-### Step 3: Install dependencies
-
-```bash
-pip install flask pandas numpy scikit-learn jupyter
-```
-
-### Step 4: Train the model
-
-Launch Jupyter Notebook:
-
-```bash
-jupyter notebook
-```
-
-Open and run all cells in:
-
-```text
-Modeling.ipynb
-```
-
-Ensure the trained model and scaler are saved in the `Models` directory.
-
-### Step 5: Run the Flask application
-
-```bash
-python app.py
-```
-
-### Step 6: Access the application
-
-Open your browser and navigate to:
-
-```text
-http://127.0.0.1:5000
+flask
+numpy
+scikit-learn
 ```
 
 ---
 
-## ⚠️ Challenges Faced and Solutions
+## Sample Test Cases
 
-| Challenge | Solution |
-|-----------|-----------|
-| `FileNotFoundError` while loading the model | Verified the project structure and corrected the model path to `Models/rf_classifier.pkl`. |
-| `ModuleNotFoundError: No module named 'sklearn'` | Installed the required dependencies inside the project's virtual environment. |
-| Multiple virtual environments (`venv` and `.venv`) were created accidentally | Removed the redundant environment and maintained a single `venv` folder. |
-| Git tracking unnecessary files | Configured `.gitignore` to exclude `venv/`, `__pycache__/`, and notebook checkpoint files. |
-| Compatibility issues with Python 3.14 while installing Scikit-learn | Used a compatible Python version (Python 3.11) and recreated the virtual environment. |
+### High Risk Patient (expected: Heart Disease)
+
+| Field | Value |
+|---|---|
+| Gender | Male |
+| Age | 63 |
+| Current Smoker | Yes |
+| Cigarettes/Day | 30 |
+| BP Medications | Yes |
+| Prevalent Stroke | Yes |
+| Prevalent Hypertension | Yes |
+| Diabetes | Yes |
+| Total Cholesterol | 310 |
+| Systolic BP | 175 |
+| Diastolic BP | 105 |
+| BMI | 34.2 |
+| Heart Rate | 95 |
+| Glucose | 220 |
+
+### Low Risk Patient (expected: No Heart Disease)
+
+| Field | Value |
+|---|---|
+| Gender | Female |
+| Age | 32 |
+| Current Smoker | No |
+| Cigarettes/Day | 0 |
+| BP Medications | No |
+| Prevalent Stroke | No |
+| Prevalent Hypertension | No |
+| Diabetes | No |
+| Total Cholesterol | 185 |
+| Systolic BP | 112 |
+| Diastolic BP | 74 |
+| BMI | 22.5 |
+| Heart Rate | 68 |
+| Glucose | 78 |
 
 ---
 
-## 📚 Key Learnings
+## Dataset
 
-- Understanding the end-to-end machine learning workflow
-- Training and evaluating a classification model
-- Saving and loading machine learning models using Pickle
-- Building simple web applications with Flask
-- Managing dependencies using virtual environments
-- Using Git and GitHub for version control
+**Framingham Heart Study** — a longitudinal cardiovascular cohort study.  
+Source: [Kaggle — Framingham Heart Study Dataset](https://www.kaggle.com/datasets/aasheesh200/framingham-heart-study-dataset)
 
 ---
 
-## 🔮 Future Improvements
+## License
 
-- Improve the frontend design and user experience
-- Deploy the application on cloud platforms such as Render
-- Compare multiple machine learning algorithms
-- Add input validation and better error handling
-
----
-
-## 🙌 Acknowledgements
-
-This project was developed as a learning exercise to understand how machine learning models can be integrated into web applications for real-world use cases.
+This project is for educational purposes only and is not intended for clinical use.
