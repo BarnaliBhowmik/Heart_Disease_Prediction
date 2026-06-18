@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heart Disease Prediction</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --red-50: #FFF1F1;
+            --red-100: #FFD6D6;
+            --red-400: #F05454;
+            --red-600: #C0392B;
+            --red-800: #7B1F1F;
+            --slate-50: #F8F9FA;
+            --slate-100: #EEF0F3;
+            --slate-200: #DCE0E7;
+            --slate-400: #8A94A6;
+            --slate-600: #4A5568;
+            --slate-800: #1A202C;
+            --green-50: #F0FDF4;
+            --green-400: #34C759;
+            --green-600: #1A7A32;
+            --green-800: #0A3D1A;
+            --amber-50: #FFFBEB;
+            --amber-400: #F59E0B;
+            --amber-800: #78350F;
+            --radius: 14px;
+            --radius-sm: 8px;
+            --shadow: 0 2px 12px rgba(0,0,0,0.07);
+            --shadow-md: 0 4px 24px rgba(0,0,0,0.10);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--slate-800);
+            min-height: 100vh;
+            padding: 2rem 1rem 4rem;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: url('/static/Heart_Disease.jpeg') center center / cover no-repeat;
+            opacity: 0.75;
+            z-index: -1;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: rgba(248, 249, 250, 0.35);
+            z-index: -1;
+        }
+
+        /* --- Page header --- */
+        .page-header {
+            max-width: 680px;
+            margin: 0 auto 2rem;
+            text-align: center;
+        }
+        .page-header .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--red-50);
+            color: var(--red-600);
+            border: 1px solid var(--red-100);
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            padding: 5px 14px;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+        .pulse-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: var(--red-400);
+            animation: pulse 1.8s ease-in-out infinite;
+        }
+        @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(0.85)} }
+        .page-header h1 {
+            font-family: 'DM Serif Display', serif;
+            font-size: clamp(26px, 5vw, 38px);
+            font-weight: 400;
+            line-height: 1.2;
+            color: var(--slate-800);
+            margin-bottom: 0.5rem;
+        }
+        .page-header p {
+            font-size: 14px;
+            color: #6B3F26;
+            line-height: 1.6;
+        }
+
+        /* --- Progress bar --- */
+        .progress-wrap {
+            max-width: 680px;
+            margin: 0 auto 1.5rem;
+        }
+        .progress-steps { display: flex; gap: 6px; }
+        .progress-steps .ps {
+            flex: 1; height: 4px; border-radius: 2px;
+            background: var(--slate-200);
+            transition: background 0.35s;
+        }
+        .progress-steps .ps.done   { background: var(--red-400); }
+        .progress-steps .ps.active { background: var(--red-100); }
+        .progress-label {
+            font-size: 12px; color: #6B3F26;
+            margin-top: 8px;
+            display: flex; justify-content: space-between;
+        }
+
+        /* --- Cards --- */
+        .card {
+            background: #fff;
+            border: 1px solid var(--slate-200);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            max-width: 680px;
+            margin: 0 auto 1rem;
+            overflow: hidden;
+        }
+        .card-header {
+            display: flex; align-items: center; gap: 10px;
+            padding: 1rem 1.25rem 0.875rem;
+            border-bottom: 1px solid var(--slate-100);
+        }
+        .card-icon {
+            width: 34px; height: 34px;
+            border-radius: var(--radius-sm);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px;
+        }
+        .card-icon.red   { background: var(--red-50); }
+        .card-icon.blue  { background: #EFF6FF; }
+        .card-icon.amber { background: var(--amber-50); }
+        .card-header h2  { font-size: 14px; font-weight: 600; color: var(--slate-800); }
+        .card-header span { font-size: 12px; color: var(--slate-400); margin-left: auto; }
+        .card-body { padding: 1.25rem; }
+
+        /* --- Field grid --- */
+        .field-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.25rem;
+        }
+        @media(max-width:520px){ .field-grid{ grid-template-columns:1fr; } }
+        .field { display: flex; flex-direction: column; gap: 6px; }
+        .field label {
+            font-size: 11px; font-weight: 600;
+            color: var(--slate-400);
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+        .field-val-row {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 2px;
+        }
+        .field-val-row .live-val  { font-size: 15px; font-weight: 600; color: var(--slate-800); }
+        .field-val-row .live-unit { font-size: 11px; color: var(--slate-400); }
+
+        /* --- Sliders --- */
+        input[type=range] {
+            -webkit-appearance: none; appearance: none;
+            width: 100%; height: 4px; border-radius: 2px;
+            background: var(--slate-200); outline: none; cursor: pointer;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; appearance: none;
+            width: 18px; height: 18px; border-radius: 50%;
+            background: var(--red-400);
+            border: 2px solid #fff;
+            box-shadow: 0 0 0 2px var(--red-100);
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        input[type=range]:hover::-webkit-slider-thumb { transform: scale(1.15); box-shadow: 0 0 0 4px var(--red-100); }
+        input[type=range]::-moz-range-thumb {
+            width: 18px; height: 18px; border-radius: 50%;
+            background: var(--red-400);
+            border: 2px solid #fff;
+            box-shadow: 0 0 0 2px var(--red-100); cursor: pointer;
+        }
+
+        /* --- Toggle buttons --- */
+        .toggle-group { display: flex; gap: 6px; }
+        .tog {
+            flex: 1; padding: 8px 6px;
+            border: 1px solid var(--slate-200);
+            border-radius: var(--radius-sm);
+            background: var(--slate-50);
+            font-size: 13px; font-weight: 500;
+            color: var(--slate-600);
+            cursor: pointer; transition: all 0.15s; text-align: center;
+        }
+        .tog:hover { border-color: var(--red-100); color: var(--red-600); background: var(--red-50); }
+        .tog.active-yes { background: var(--red-50);    border-color: var(--red-400);    color: var(--red-600);    font-weight: 600; }
+        .tog.active-no  { background: var(--slate-100); border-color: var(--slate-200);  color: var(--slate-800);  font-weight: 600; }
+        .tog.active-gender { background: #EFF6FF; border-color: #93C5FD; color: #1D4ED8; font-weight: 600; }
+
+        /* --- Nav buttons --- */
+        .nav-row { display: flex; gap: 10px; max-width: 680px; margin: 0 auto 1rem; }
+        .btn {
+            flex: 1; padding: 13px 20px;
+            border-radius: var(--radius-sm);
+            font-family: 'Inter', sans-serif;
+            font-size: 14px; font-weight: 600;
+            cursor: pointer; transition: all 0.15s;
+            border: 1px solid var(--slate-200);
+            background: #fff; color: var(--slate-600);
+        }
+        .btn:hover { background: var(--slate-100); }
+        .btn.primary { background: var(--slate-800); border-color: var(--slate-800); color: #fff; }
+        .btn.primary:hover { background: var(--slate-600); border-color: var(--slate-600); }
+        .btn.danger  { background: var(--red-400);   border-color: var(--red-400);   color: #fff; }
+        .btn.danger:hover  { background: var(--red-600); border-color: var(--red-600); }
+
+        .hidden { display: none !important; }
+
+        /* --- Result block --- */
+        .hb-divider {
+            max-width: 680px; margin: 0.5rem auto 1.25rem;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .hb-line  { flex: 1; height: 1px; background: var(--slate-200); }
+        .hb-icon  { font-size: 18px; color: var(--red-400); animation: pulse 2s infinite; }
+
+        .flask-result {
+            background: #fff;
+            border: 1px solid var(--slate-200);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-md);
+            padding: 1.5rem;
+            max-width: 680px;
+            margin: 0 auto 1rem;
+            text-align: center;
+        }
+        .flask-result h2 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 22px; font-weight: 400;
+            color: var(--slate-800); margin-bottom: 0.5rem;
+        }
+        .flask-result p { font-size: 14px; color: var(--slate-600); line-height: 1.6; }
+
+        .result-positive {
+            display: inline-block;
+            margin-top: 0.75rem;
+            padding: 10px 20px;
+            border-radius: 999px;
+            font-size: 15px; font-weight: 600;
+            background: var(--red-50);
+            color: var(--red-600);
+            border: 1px solid var(--red-100);
+        }
+        .result-negative {
+            display: inline-block;
+            margin-top: 0.75rem;
+            padding: 10px 20px;
+            border-radius: 999px;
+            font-size: 15px; font-weight: 600;
+            background: var(--green-50);
+            color: var(--green-600);
+            border: 1px solid #A7F3D0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Page header -->
+    <div class="page-header">
+        <div class="badge">
+            <div class="pulse-dot"></div>
+            Framingham Risk Assessment
+        </div>
+        <h1>10-Year Heart Disease<br>Risk Prediction</h1>
+        <p>Fill in your health details across 3 short sections.<br>Every field matters — take your time.</p>
+    </div>
+
+    <!-- Progress -->
+    <div class="progress-wrap">
+        <div class="progress-steps">
+            <div class="ps active" id="ps0"></div>
+            <div class="ps" id="ps1"></div>
+            <div class="ps" id="ps2"></div>
+        </div>
+        <div class="progress-label">
+            <span id="stepLabel">Step 1 of 3 — Personal info</span>
+            <span id="stepCount">1 / 3</span>
+        </div>
+    </div>
+
+    <form action="/predict" method="post" id="mainForm">
+
+        <!-- ── STEP 0: Personal ── -->
+        <div id="step0">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon blue">👤</div>
+                    <h2>Personal details</h2>
+                    <span>4 fields</span>
+                </div>
+                <div class="card-body">
+                    <div class="field-grid">
+
+                        <!-- Gender — sends "male" or "female" to match app.py -->
+                        <div class="field">
+                            <label>Gender</label>
+                            <div class="toggle-group">
+                                <button type="button" class="tog active-gender" id="gM" onclick="setGender('male')">♂ Male</button>
+                                <button type="button" class="tog" id="gF" onclick="setGender('female')">♀ Female</button>
+                            </div>
+                            <input type="hidden" name="male" id="male" value="male">
+                        </div>
+
+                        <!-- Age -->
+                        <div class="field">
+                            <label>Age</label>
+                            <div class="field-val-row">
+                                <span class="live-val" id="ageOut">45</span>
+                                <span class="live-unit">years</span>
+                            </div>
+                            <input type="range" min="20" max="90" value="45" step="1"
+                                   oninput="syncSlider('ageOut','age',this.value)">
+                            <input type="hidden" name="age" id="age" value="45">
+                        </div>
+
+                        <!-- BMI -->
+                        <div class="field">
+                            <label>BMI</label>
+                            <div class="field-val-row">
+                                <span class="live-val" id="bmiOut">25.0</span>
+                                <span class="live-unit">kg/m²</span>
+                            </div>
+                            <input type="range" min="15" max="50" value="25" step="0.1"
+                                   oninput="syncSliderF('bmiOut','BMI',this.value,1)">
+                            <input type="hidden" name="BMI" id="BMI" value="25.0">
+                        </div>
+
+                        <!-- Heart Rate -->
+                        <div class="field">
+                            <label>Heart rate</label>
+                            <div class="field-val-row">
+                                <span class="live-val" id="hrOut">72</span>
+                                <span class="live-unit">bpm</span>
+                            </div>
+                            <input type="range" min="40" max="150" value="72" step="1"
+                                   oninput="syncSlider('hrOut','heartRate',this.value)">
+                            <input type="hidden" name="heartRate" id="heartRate" value="72">
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="nav-row">
+                <button type="button" class="btn primary" onclick="goStep(1)">Continue &rarr;</button>
+            </div>
+        </div>
+
+        <!-- ── STEP 1: Lifestyle ── -->
+        <div id="step1" class="hidden">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon amber">🚬</div>
+                    <h2>Lifestyle &amp; conditions</h2>
+                    <span>4 fields</span>
+                </div>
+                <div class="card-body">
+                    <div class="field-grid">
+
+                        <!-- Current Smoker — sends "yes" or "no" -->
+                        <div class="field">
+                            <label>Current smoker</label>
+                            <div class="toggle-group">
+                                <button type="button" class="tog" id="csY" onclick="setToggle('currentSmoker','csY','csN','yes')">Yes</button>
+                                <button type="button" class="tog active-no" id="csN" onclick="setToggle('currentSmoker','csN','csY','no')">No</button>
+                            </div>
+                            <input type="hidden" name="currentSmoker" id="currentSmoker" value="no">
+                        </div>
+
+                        <!-- Cigarettes per day -->
+                        <div class="field">
+                            <label>Cigarettes per day</label>
+                            <div class="field-val-row">
+                                <span class="live-val" id="cigOut">0</span>
+                                <span class="live-unit">per day</span>
+                            </div>
+                            <input type="range" min="0" max="60" value="0" step="1"
+                                   oninput="syncSlider('cigOut','cigsPerDay',this.value)">
+                            <input type="hidden" name="cigsPerDay" id="cigsPerDay" value="0">
+                        </div>
+
+                        <!-- Glucose -->
+                        <div class="field">
+                            <label>Glucose level</label>
+                            <div class="field-val-row">
+                                <span class="live-val" id="gluOut">85</span>
+                                <span class="live-unit">mg/dL</span>
+                            </div>
+                            <input type="range" min="60" max="400" value="85" step="1"
+                                   oninput="syncSlider('gluOut','glucose',this.value)">
+                            <input type="hidden" name="glucose" id="glucose" value="85">
+                        </div>
+
+                        <!-- Diabetes — sends "yes" or "no" -->
+                        <div class="field">
+                            <label>Diabetes</label>
+                            <div class="toggle-group">
+                                <button type="button" class="tog" id="dbY" onclick="setToggle('diabetes','dbY','dbN','yes')">Yes</button>
+                                <button type="button" class="tog active-no" id="dbN" onclick="setToggle('diabetes','dbN','dbY','no')">No</button>
+                            </div>
+                            <input type="hidden" name="diabetes" id="diabetes" value="no">
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="nav-row">
+                <button type="button" class="btn" onclick="goStep(0)">&larr; Back</button>
+                <button type="button" class="btn primary" onclick="goStep(2)">Continue &rarr;</button>
+            </div>
+        </div>
+
+        <!-- ── STEP 2: Cardiovascular ── -->
+        <div id="step2" class="hidden">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon red">❤️</div>
+                    <h2>Cardiovascular health</h2>
+                    <span>6 fields</span>
+                </div>
+                <div class="card-body">
+                    <div class="field-grid">
+
+                        <!-- Total Cholesterol -->
+                        <div class="field">
+                            <label>Total cholesterol</label>
+                            <div class="field-val-row">
+                                <span class="live-val" id="cholOut">200</span>
+                                <span class="live-unit">mg/dL</span>
+                            </div>
+                            <input type="range" min="100" max="400" value="200" step="1"
+                                   oninput="syncSlider('cholOut','totChol',this.value)">
+                            <input type="hidden" name="totChol" id="totChol" value="200">
+                        </div>
+
+                        <!-- Systolic BP -->
+                        <div class="field">
+                            <label>Systolic BP</label>
+                            <div class="field-val-row">
+                                <span class="live-val" id="sysOut">120</span>
+                                <span class="live-unit">mmHg</span>
+                            </div>
+                            <input type="range" min="80" max="220" value="120" step="1"
+                                   oninput="syncSlider('sysOut','sysBP',this.value)">
+                            <input type="hidden" name="sysBP" id="sysBP" value="120">
+                        </div>
+
+                        <!-- Diastolic BP -->
+                        <div class="field">
+                            <label>Diastolic BP</label>
+                            <div class="field-val-row">
+                                <span class="live-val" id="diaOut">80</span>
+                                <span class="live-unit">mmHg</span>
+                            </div>
+                            <input type="range" min="40" max="140" value="80" step="1"
+                                   oninput="syncSlider('diaOut','diaBP',this.value)">
+                            <input type="hidden" name="diaBP" id="diaBP" value="80">
+                        </div>
+
+                        <!-- BP Medications — sends "yes" or "no" -->
+                        <div class="field">
+                            <label>BP medications</label>
+                            <div class="toggle-group">
+                                <button type="button" class="tog" id="bpY" onclick="setToggle('BPMeds','bpY','bpN','yes')">Yes</button>
+                                <button type="button" class="tog active-no" id="bpN" onclick="setToggle('BPMeds','bpN','bpY','no')">No</button>
+                            </div>
+                            <input type="hidden" name="BPMeds" id="BPMeds" value="no">
+                        </div>
+
+                        <!-- Prevalent Hypertension — sends "yes" or "no" -->
+                        <div class="field">
+                            <label>Prevalent hypertension</label>
+                            <div class="toggle-group">
+                                <button type="button" class="tog" id="hypY" onclick="setToggle('prevalentHyp','hypY','hypN','yes')">Yes</button>
+                                <button type="button" class="tog active-no" id="hypN" onclick="setToggle('prevalentHyp','hypN','hypY','no')">No</button>
+                            </div>
+                            <input type="hidden" name="prevalentHyp" id="prevalentHyp" value="no">
+                        </div>
+
+                        <!-- Prevalent Stroke — sends "yes" or "no" -->
+                        <div class="field">
+                            <label>Prevalent stroke</label>
+                            <div class="toggle-group">
+                                <button type="button" class="tog" id="stY" onclick="setToggle('prevalentStroke','stY','stN','yes')">Yes</button>
+                                <button type="button" class="tog active-no" id="stN" onclick="setToggle('prevalentStroke','stN','stY','no')">No</button>
+                            </div>
+                            <input type="hidden" name="prevalentStroke" id="prevalentStroke" value="no">
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="nav-row">
+                <button type="button" class="btn" onclick="goStep(1)">&larr; Back</button>
+                <button type="submit" class="btn danger">Get prediction &rarr;</button>
+            </div>
+        </div>
+
+    </form>
+
+    <!-- Flask result block -->
+    {% if prediction %}
+    <div class="hb-divider">
+        <div class="hb-line"></div>
+        <div class="hb-icon">♥</div>
+        <div class="hb-line"></div>
+    </div>
+    <div class="flask-result">
+        <h2>Prediction Result</h2>
+        <p>Based on the provided information, the 10-year coronary heart disease risk is:</p>
+        {% if "No Heart Disease" in prediction %}
+            <div class="result-negative">✅ {{ prediction }}</div>
+        {% else %}
+            <div class="result-positive">⚠️ {{ prediction }}</div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <script>
+        // Slider → hidden input (integer)
+        function syncSlider(outId, hiddenId, val) {
+            document.getElementById(outId).textContent = val;
+            document.getElementById(hiddenId).value = val;
+        }
+        // Slider → hidden input (float with decimals)
+        function syncSliderF(outId, hiddenId, val, dec) {
+            document.getElementById(outId).textContent = parseFloat(val).toFixed(dec);
+            document.getElementById(hiddenId).value = parseFloat(val).toFixed(dec);
+        }
+
+        // Gender toggle — sends "male" / "female"
+        function setGender(val) {
+            document.getElementById('male').value = val;
+            document.getElementById('gM').className = 'tog' + (val === 'male'   ? ' active-gender' : '');
+            document.getElementById('gF').className = 'tog' + (val === 'female' ? ' active-gender' : '');
+        }
+
+        // Binary toggle — sends "yes" / "no"
+        function setToggle(fieldId, onId, offId, val) {
+            document.getElementById(fieldId).value = val;
+            const isYes = (val === 'yes');
+            document.getElementById(onId).className  = 'tog ' + (isYes  ? 'active-yes' : 'active-no');
+            document.getElementById(offId).className = 'tog ' + (!isYes ? 'active-no'  : '');
+        }
+
+        // Step navigation
+        const steps  = ['step0','step1','step2'];
+        const labels = ['Step 1 of 3 — Personal info','Step 2 of 3 — Lifestyle','Step 3 of 3 — Cardiovascular'];
+
+        function goStep(n) {
+            steps.forEach((id, i) => document.getElementById(id).classList.toggle('hidden', i !== n));
+            document.getElementById('stepLabel').textContent = labels[n];
+            document.getElementById('stepCount').textContent = (n + 1) + ' / 3';
+            ['ps0','ps1','ps2'].forEach((id, i) => {
+                document.getElementById(id).className = 'ps' + (i < n ? ' done' : i === n ? ' active' : '');
+            });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
