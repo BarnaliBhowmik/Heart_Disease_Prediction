@@ -3,6 +3,8 @@
 A machine learning web application that predicts the **10-year risk of coronary heart disease (CHD)** based on clinical and lifestyle inputs, built on the Framingham Heart Study dataset.
 
 🎥 **[Watch Demo](https://drive.google.com/file/d/1YQ-G7gmMIsGlcP55gAYt8kTwqInjTgLX/view?usp=sharing)**
+<img width="1001" height="521" alt="Screenshot 2026-10-31 070956" src="https://github.com/user-attachments/assets/609bc011-3550-49c6-b3f1-3310072c0306" />
+<img width="1007" height="517" alt="Screenshot 2026-10-31 071012" src="https://github.com/user-attachments/assets/479e1a69-fcc1-45a9-b55c-4888423d32f9" />
 
 ---
 
